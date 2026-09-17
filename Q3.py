@@ -416,7 +416,8 @@ print("-------------------")
 R = 89.17
 B = 3
 rho = 1.225
-res_wind = 50
+res_wind = 50  
+#lets goo
 
 Vinf = np.linspace(V_cut_in,V_cut_out,res_wind)
 
