@@ -8,12 +8,21 @@ import matplotlib.pyplot as plt
 
 # Use whitespace for ALL files
 cylinder = pd.read_csv('cylinder.txt', sep=r'\s+', header=None)
+blade_data = pd.read_csv('bladedat.txt', sep=r'\s+', header=None)
+
+file_names = ['FFA-W3-600.txt','FFA-W3-480.txt','FFA-W3-360.txt','FFA-W3-301.txt','FFA-W3-241.txt']
+data = []
+for num, file in enumerate(file_names):
+    data[num] = pd.read_csv(file, sep=r'\s+', header=None)
+
+    
+    '''
 blade600 = pd.read_csv('FFA-W3-600.txt', sep=r'\s+', header=None)
 blade480 = pd.read_csv('FFA-W3-480.txt', sep=r'\s+', header=None)
 blade360 = pd.read_csv('FFA-W3-360.txt', sep=r'\s+', header=None)
 blade301 = pd.read_csv('FFA-W3-301.txt', sep=r'\s+', header=None)
 blade241 = pd.read_csv('FFA-W3-241.txt', sep=r'\s+', header=None)
-blade_data = pd.read_csv('bladedat.txt', sep=r'\s+', header=None)
+'''
 # ============================================================
 # BLADE GEOMETRY
 # ============================================================
@@ -417,7 +426,6 @@ R = 89.17
 B = 3
 rho = 1.225
 res_wind = 50  
-pitch_incerements = 3 #degree of pitch change for the plots
 #lets goo
 
 Vinf = np.linspace(V_cut_in,V_cut_out,res_wind)
@@ -453,7 +461,6 @@ pitch = 2.344
 # ============================================================
 power_per_wind_speed = []
 pitch_per_wind_speed = []
-omega_per_wind_speed = []
 for j, Wind_speed in enumerate(Vinf):
 
     print("Started working Boss..."+str(Wind_speed))
@@ -465,50 +472,14 @@ for j, Wind_speed in enumerate(Vinf):
         power_total = loop_through_blade(Wind_speed,omega, pitch_offset=pitch_control)
         print(f"pitch={pitch_control:.1f}  power={power_total:.3e}")
         if power_total > P_rated:
-            pitch_control += pitch_incerements
+            pitch_control += 3
         else:
             print('Pitch value is : '+str(pitch_control))
             break
 
     power_per_wind_speed.append(power_total)
     pitch_per_wind_speed.append(pitch_control)
-    omega_per_wind_speed.append(omega)
 print("Done :()")
-
-path = r'/home/hypr/Desktop/DTU/Wind_turbine_tech/ass1/power_data_1.txt'
-np.savetxt(path,(Vinf,power_per_wind_speed),fmt='%d')
-
-
-#Now compute power towards stall, so lift will be negaative and turbine will be spinning other way
-#for that same fucntion will be called but the negative aoa examined
-power_per_wind_speed_negative = []
-pitch_per_wind_speed_negative = []
-omega_per_wind_speed_negative = []
-print('Computing towards negative aoa...')
-for j, Wind_speed in enumerate(Vinf):
-
-    print("Started working Boss..."+str(Wind_speed))
-
-    omega = TSR * Wind_speed / R
-    power_list = []
-    pitch_control = 0
-    for i in range(5000):
-        power_total = loop_through_blade(Wind_speed,omega, pitch_offset=pitch_control)
-        print(f"pitch={pitch_control:.1f}  power={power_total:.3e}")
-        if power_total > P_rated:
-            pitch_control -= pitch_incerements
-        else:
-            print('Pitch value is : '+str(pitch_control))
-            break
-
-    power_per_wind_speed_negative.append(power_total)
-    pitch_per_wind_speed_negative.append(pitch_control)
-    omega_per_wind_speed_negative.append(omega)
-print("Done :()")
-#saving power data for ex 5
-
-
-
 
 plt.plot(Vinf,power_per_wind_speed)
 plt.title('Power VS Wind Speed Graph', fontsize=14)
@@ -523,42 +494,3 @@ plt.xlabel('Wind speed', fontsize=12)
 plt.ylabel('Pitch angle [deg]', fontsize=12)
 plt.show()
 
-plt.plot(Vinf,omega_per_wind_speed)
-plt.title('Omega VS Wind Speed Graph', fontsize=14)
-plt.xlabel('Wind speed', fontsize=12)
-plt.ylabel('Omega', fontsize=12)
-plt.show()
-
-#negative plotting
-plt.plot(Vinf,power_per_wind_speed_negative)
-plt.title('Power VS Wind Speed Graph', fontsize=14)
-plt.xlabel('Wind speed [m/s]', fontsize=12)
-plt.ylabel('Power [Watts]', fontsize=12)
-plt.legend()
-plt.show()
-
-plt.plot(Vinf,pitch_per_wind_speed_negative)
-plt.title('Pitch VS Wind Speed Graph', fontsize=14)
-plt.xlabel('Wind speed', fontsize=12)
-plt.ylabel('Pitch angle [deg]', fontsize=12)
-plt.show()
-
-plt.plot(Vinf,omega_per_wind_speed_negative)
-plt.title('Omega VS Wind Speed Graph', fontsize=14)
-plt.xlabel('Wind speed', fontsize=12)
-plt.ylabel('Omega', fontsize=12)
-plt.show()
-
-plt.plot(Vinf,power_per_wind_speed)
-plt.plot(Vinf,power_per_wind_speed_negative)
-plt.title('Power VS Wind Speed Graph', fontsize=14)
-plt.xlabel('Wind speed', fontsize=12)
-plt.ylabel('Power', fontsize=12)
-plt.show()
-
-plt.plot(Vinf,pitch_per_wind_speed)
-plt.plot(Vinf,pitch_per_wind_speed_negative)
-plt.title('Power VS Wind Speed Graph', fontsize=14)
-plt.xlabel('Wind speed', fontsize=12)
-plt.ylabel('Power', fontsize=12)
-plt.show()
